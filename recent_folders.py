@@ -5,7 +5,7 @@ import os
 import json
 import subprocess
 
-class RecentFoldersCommand(sublime_plugin.WindowCommand):
+class RecentFoldersCommand(sublime_plugin.ApplicationCommand):
 
   sublime_session_file = "Auto Save Session.sublime_session"
   fallback_sublime_session_file = "Session.sublime_session"
@@ -13,9 +13,9 @@ class RecentFoldersCommand(sublime_plugin.WindowCommand):
   sublime_exec = '/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl'
 
   def run(self):
-    window = self.window
+    self.window = sublime.active_window()
 
-    if window:
+    if self.window:
       packages_dir: str = sublime.packages_path()
       sublime_dir: str = os.path.dirname(packages_dir)
       local_dir = f"{sublime_dir}/Local"
@@ -30,7 +30,7 @@ class RecentFoldersCommand(sublime_plugin.WindowCommand):
           json_content = json.load(f)
           folder_history = json_content.get('folder_history')
           if folder_history:
-            window.show_quick_panel(
+            self.window.show_quick_panel(
               items = folder_history,
               placeholder = "Open Folder:",
               on_select = lambda index: self.on_select(self.window, folder_history, index),
